@@ -1,0 +1,112 @@
+ამ სერვისის მისაღებად საჭიროა დავაყენოთ ნუგეთ ფექეჯი Install-package Microsoft.exstension.dependencyinjection
+
+ServiceCollection და IServiceCollection არის დაკავშირებული კლასები Microsoft.Extensions.DependencyInjection სახელთა სივრცეში, ხოლო ServiceProvider და IServiceProvider ასევე დაკავშირებული კლასებია იმავე სახელთა სივრცეში.
+IServiceCollection არის ინტერფეისი, რომელიც წარმოადგენს სერვისების კრებულს, რომელთა რეგისტრაცია და მიღება შესაძლებელია დამოკიდებულების ინექციით. ის განსაზღვრავს მეთოდებს, რომ დაამატოთ ახალი სერვისები კოლექციაში, დააკონფიგურიროთ მომსახურების 
+ვადები და შექმნათ სერვისის პროვაიდერი კოლექციიდან. 
+სხვა სიტყვებით რომ ვთქვათ, IServiceCollection გამოიყენება ხელმისაწვდომი სერვისების და მათი კონფიგურაციის დასადგენად.
+ServiceCollection არის IServiceCollection ინტერფეისის იმპლემენტაცია. ის უზრუნველყოფს სერვისების კოლექციის ნაგულისხმევ განხორციელებას, რომელიც გამოიყენება სერვისების რეგისტრაციისა და კონფიგურაციისთვის.
+მოკლედ, IServiceCollection განსაზღვრავს ხელშეკრულებას მომსახურების შეგროვებისთვის და ServiceCollection უზრუნველყოფს ამ ხელშეკრულების ნაგულისხმევ განხორციელებას.
+მეორეს მხრივ, IServiceProvider არის ინტერფეისი, რომელიც განსაზღვრავს სერვისების მოპოვების მეთოდებს სერვისის კონტეინერიდან. მას აქვს მხოლოდ ერთი მეთოდი, GetService, რომელიც იღებს Type ობიექტს, რომელიც წარმოადგენს მოსაბრუნებელ სერვისს და აბრუნებს ამ სერვისის მაგალითს.
+ServiceProvider არის IServiceProvider ინტერფეისის იმპლემენტაცია. ის უზრუნველყოფს სერვისის კონტეინერის ნაგულისხმევ განხორციელებას, რომელიც გამოიყენება სერვისების მისაღებად.
+მოკლედ, IServiceProvider განსაზღვრავს კონტრაქტს მომსახურების კონტეინერისთვის და ServiceProvider უზრუნველყოფს ამ ხელშეკრულების ნაგულისხმევ განხორციელებას.
+დასასრულს, IServiceCollection და ServiceCollection გამოიყენება სერვისების რეგისტრაციისა და კონფიგურაციისთვის, ხოლო IServiceProvider და ServiceProvider გამოიყენება სერვისების კონტეინერიდან სერვისების მისაღებად.
+
+
+1)დავაინიციალზოთ ServiceCollection
+	services.AddTransient<IMyService, MyService>();
+
+2)ვქმნით სერვის პროვაიდერს ServiceCollection ინსტანსიდან გავდივართ მის მეთოდეზე BuildSeviceProvider()
+	var serviceProvider = services.BuildServiceProvider();
+
+	ეს მეთოდი ქმნის ServiceProvider-ის ახალ ინსტანციას, რომელიც კონფიგურირებულია IServiceCollection-ში რეგისტრირებული სერვისების გამოყენებით.
+	როდესაც თქვენ დაარეგისტრირებთ სერვისებს IServiceCollection-ში, თქვენ განსაზღვრავთ დამოკიდებულებებს, რომლებიც სჭირდება თქვენს აპლიკაციას. 
+	მას შემდეგ რაც დარეგისტრირდებით ყველა თქვენს მომსახურებას, შეგიძლიათ გამოიძახოთ BuildServiceProvider() IServiceCollection-ზე ახალი ServiceProvider-ის შესაქმნელად. 
+	ეს სერვისის პროვაიდერი გამოიყენებს სერვისების რეგისტრაციებს სერვისების და მათი დამოკიდებულების მაგალითების შესაქმნელად, როდესაც მათ მოითხოვენ თქვენი განაცხადის სხვა ნაწილები დამოკიდებულების ინექციით.
+
+3)შემდეგ შეგიძლიათ გამოიყენოთ სერვისის პროვაიდერი რეგისტრირებული სერვისის შემთხვევების მოსაგვარებლად:
+	var myService = serviceProvider.GetService<IMyService>();
+
+	GetService() მეთოდი ყოველ ჯერზე დააბრუნებს MyService-ის ახალ ინსტანციას, რადგან სერვისი დარეგისტრირდა როგორც გარდამავალი.
+	მოკლედ, BuildServiceProvider() არის მეთოდი, რომელიც ქმნის ServiceProvider-ის ახალ ინსტანციას სერვისის რეგისტრაციების გამოყენებით IServiceCollection-ში, რაც საშუალებას გაძლევთ გადაჭრათ თქვენი რეგისტრირებული სერვისების ეგზემპლარები.
+
+.AddSingleton
+	Same Instance for the Entire Application
+	*One Instance For The Whole App
+.AddScoped
+	Same Instance For the Whole Request
+	*Every Time a Page is Viewed(in MVC)
+	*Not Perfect for Multi Threading
+.AddTransient
+	Different Instance Every time object is Requested Or Injected
+	*Every Time,A new Instance is Injected
+	* Suitable For Multi Threading
+
+
+
+IServiceCollection არის მეხსიერების მონაცემთა სტრუქტურა, რომელიც გამოიყენება თქვენს აპლიკაციაში სერვისის რეგისტრაციების კონფიგურაციისა და შესაგროვებლად. ეს არის ნამდვილი კოლექცია, რომელიც გამოიყენება იმ სერვისების თვალყურის დევნებისთვის, 
+რომლებზეც დამოკიდებულია თქვენი აპლიკაცია.
+IServiceCollection ინტერფეისი, პრაქტიკაში, ჩვეულებრივ დანერგილია როგორც სია ან სხვა კოლექციის ტიპი მეხსიერებაში. ეს კოლექცია ინახავს ინფორმაციას თქვენს მიერ დარეგისტრირებული სერვისების შესახებ,
+როგორიცაა მათი ტიპები, სიცოცხლის ხანგრძლივობა და განხორციელების დეტალები. იგი გამოიყენება დამოკიდებულების ინექციის ჩარჩოს მიერ ამ სერვისების შექმნისა და გადაწყვეტის სამართავად, როდესაც ისინი საჭიროა თქვენი აპლიკაციის კომპონენტებისთვის.
+ასე რომ, თქვენ შეგიძლიათ წარმოიდგინოთ IServiceCollection, როგორც მეხსიერების რეესტრი ან კონტეინერი, სადაც მიუთითებთ, თუ როგორ არის კონფიგურირებული სხვადასხვა სერვისები და როგორ უნდა შეიქმნას და მართოთ ისინი თქვენი აპლიკაციის მთელი პერიოდის განმავლობაში.
+
+კლასებით
+// 1. Create a new ServiceCollection
+var services = new ServiceCollection();
+
+// 2. Register your services and dependencies
+services.AddSingleton<IMyService, MyService>();
+services.AddScoped<IUnitOfWork, UnitOfWork>();
+services.AddTransient<ILogger, Logger>();
+
+// 3. Build a ServiceProvider from the ServiceCollection
+var serviceProvider = services.BuildServiceProvider();
+
+// 4. Resolve and use services from the ServiceProvider
+var myService = serviceProvider.GetRequiredService<IMyService>();
+var unitOfWork = serviceProvider.GetRequiredService<IUnitOfWork>();
+var logger = serviceProvider.GetRequiredService<ILogger>();
+
+// 5. Use the resolved services in your application
+myService.DoSomething();
+unitOfWork.Commit();
+logger.Log("Something happened.");
+
+ინტერფეისებით
+public class Startup
+{
+    public void ConfigureServices(IServiceCollection services)
+    {
+        // Register services and dependencies using IServiceCollection
+        services.AddSingleton<IMyService, MyService>();
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
+        services.AddTransient<ILogger, Logger>();
+    }
+
+    // Other methods and configurations...
+}
+
+public class MyController : Controller
+{
+    private readonly IMyService _myService;
+    private readonly IUnitOfWork _unitOfWork;
+    private readonly ILogger _logger;
+
+    public MyController(IServiceProvider serviceProvider)
+    {
+        // Resolve services from the IServiceProvider
+        _myService = serviceProvider.GetRequiredService<IMyService>();
+        _unitOfWork = serviceProvider.GetRequiredService<IUnitOfWork>();
+        _logger = serviceProvider.GetRequiredService<ILogger>();
+    }
+
+    public IActionResult SomeAction()
+    {
+        // Use the resolved services within your action
+        _myService.DoSomething();
+        _unitOfWork.Commit();
+        _logger.Log("Something happened.");
+
+        return View();
+    }
+}
+
